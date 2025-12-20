@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'System Administrator',
             'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('123'),
             'employee_id' => 'EMP001',
             'role' => UserRole::ADMIN,
             'department_id' => 1, // HR
@@ -26,9 +26,9 @@ class UserSeeder extends Seeder
 
         // IT Manager
         $itManager = User::create([
-            'name' => 'John Smith',
-            'email' => 'john.smith@example.com',
-            'password' => Hash::make('password'),
+            'name' => 'Sinat Samuel',
+            'email' => 'sam@example.com',
+            'password' => Hash::make('123'),
             'employee_id' => 'EMP002',
             'role' => UserRole::MANAGER,
             'department_id' => 2, // IT
@@ -39,9 +39,9 @@ class UserSeeder extends Seeder
 
         // HR Manager
         $hrManager = User::create([
-            'name' => 'Sarah Johnson',
-            'email' => 'sarah.johnson@example.com',
-            'password' => Hash::make('password'),
+            'name' => 'Sam Sreynim',
+            'email' => 'sreynim@example.com',
+            'password' => Hash::make('123'),
             'employee_id' => 'EMP003',
             'role' => UserRole::MANAGER,
             'department_id' => 1, // HR
@@ -52,9 +52,9 @@ class UserSeeder extends Seeder
 
         // Finance Manager
         $finManager = User::create([
-            'name' => 'Michael Brown',
-            'email' => 'michael.brown@example.com',
-            'password' => Hash::make('password'),
+            'name' => 'Hak Kimheng',
+            'email' => 'heng@example.com',
+            'password' => Hash::make('123'),
             'employee_id' => 'EMP004',
             'role' => UserRole::MANAGER,
             'department_id' => 3, // Finance
@@ -65,9 +65,9 @@ class UserSeeder extends Seeder
 
         // IT Employees
         User::create([
-            'name' => 'Alice Williams',
-            'email' => 'alice.williams@example.com',
-            'password' => Hash::make('password'),
+            'name' => 'Sean Sophearom',
+            'email' => 'rom@example.com',
+            'password' => Hash::make('123'),
             'employee_id' => 'EMP005',
             'role' => UserRole::EMPLOYEE,
             'department_id' => 2, // IT
@@ -79,7 +79,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Bob Davis',
             'email' => 'bob.davis@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('123'),
             'employee_id' => 'EMP006',
             'role' => UserRole::EMPLOYEE,
             'department_id' => 2, // IT
@@ -91,7 +91,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Charlie Miller',
             'email' => 'charlie.miller@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('123'),
             'employee_id' => 'EMP007',
             'role' => UserRole::EMPLOYEE,
             'department_id' => 2, // IT
@@ -104,7 +104,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Diana Wilson',
             'email' => 'diana.wilson@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('123'),
             'employee_id' => 'EMP008',
             'role' => UserRole::EMPLOYEE,
             'department_id' => 1, // HR
@@ -116,7 +116,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Edward Taylor',
             'email' => 'edward.taylor@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('123'),
             'employee_id' => 'EMP009',
             'role' => UserRole::EMPLOYEE,
             'department_id' => 1, // HR
@@ -129,7 +129,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Fiona Anderson',
             'email' => 'fiona.anderson@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('123'),
             'employee_id' => 'EMP010',
             'role' => UserRole::EMPLOYEE,
             'department_id' => 3, // Finance
@@ -141,7 +141,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'George Thomas',
             'email' => 'george.thomas@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('123'),
             'employee_id' => 'EMP011',
             'role' => UserRole::EMPLOYEE,
             'department_id' => 3, // Finance
@@ -153,7 +153,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Hannah Jackson',
             'email' => 'hannah.jackson@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('123'),
             'employee_id' => 'EMP012',
             'role' => UserRole::EMPLOYEE,
             'department_id' => 3, // Finance
