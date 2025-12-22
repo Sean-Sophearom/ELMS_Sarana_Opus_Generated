@@ -36,18 +36,28 @@ export default function Welcome({ auth }: PageProps) {
                                     </Link>
                                 ) : (
                                     <>
-                                        <Link
+                                        <div className="hidden sm:flex items-center space-x-4">
+                                            <Link
                                             href={route('login')}
                                             className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
-                                        >
-                                            Sign In
-                                        </Link>
-                                        <Link
-                                            href={route('register')}
-                                            className="inline-flex items-center px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition-colors"
-                                        >
-                                            Get Started
-                                        </Link>
+                                            >
+                                                Sign In
+                                            </Link>
+                                            <Link
+                                                href={route('register')}
+                                                className="items-center px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition-colors"
+                                            >
+                                                Get Started
+                                            </Link>
+                                        </div>
+                                        <div className='sm:hidden'>
+                                            <Link
+                                                href={route('login')}
+                                                className="items-center px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition-colors"
+                                            >
+                                                Login
+                                            </Link>
+                                        </div>
                                     </>
                                 )}
                             </div>
