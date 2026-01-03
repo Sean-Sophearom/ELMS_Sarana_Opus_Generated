@@ -1,6 +1,6 @@
 // Application-wide constants
 
-export const APP_NAME = 'NiyaiLMS';
+export const APP_NAME = 'LeaveMS';
 export const APP_TAGLINE = 'Streamline your leave management';
 
 // Brand Colors
