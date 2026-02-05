@@ -24,9 +24,6 @@ A leave management application built with Laravel 12, React 18, Inertia.js, and 
 ### 1. Clone and Install
 
 ```bash
-git clone <repository-url>
-cd SaranaTestAI
-
 # Install all dependencies and set up the project
 composer setup
 ```
