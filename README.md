@@ -1,59 +1,198 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Leave Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A leave management application built with Laravel 12, React 18, Inertia.js, and Tailwind CSS.
 
-## About Laravel
+## Tech Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Backend:** PHP 8.2+, Laravel 12
+- **Frontend:** React 18, TypeScript, Tailwind CSS
+- **Bridge:** Inertia.js 2.0
+- **Build:** Vite 7
+- **Auth:** Laravel Breeze
+- **Routing:** Ziggy (Laravel routes in JS)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.2+
+- Composer
+- Node.js 18+
+- npm or yarn
+- SQLite / MySQL / PostgreSQL
 
-## Learning Laravel
+## Quick Start
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 1. Clone and Install
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+git clone <repository-url>
+cd SaranaTestAI
 
-## Laravel Sponsors
+# Install all dependencies and set up the project
+composer setup
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+The `composer setup` script will:
+- Install PHP dependencies
+- Copy `.env.example` to `.env`
+- Generate application key
+- Run database migrations
+- Install npm dependencies
+- Build frontend assets
 
-### Premium Partners
+### 2. Configure Environment
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Edit `.env` file for your database and mail settings:
 
-## Contributing
+```env
+DB_CONNECTION=sqlite
+# or configure MySQL/PostgreSQL
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+MAIL_MAILER=smtp
+MAIL_HOST=...
+```
 
-## Code of Conduct
+### 3. Seed the Database (Optional)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan db:seed
+```
 
-## Security Vulnerabilities
+This will create sample departments, leave types, users, and leave requests.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Development
+
+### Start Development Server
+
+```bash
+composer dev
+```
+
+This runs concurrently:
+- Laravel server (`php artisan serve`)
+- Queue worker (`php artisan queue:listen`)
+- Log viewer (`php artisan pail`)
+- Vite dev server (`npm run dev`)
+
+Access the app at: **http://localhost:8000**
+
+### Individual Commands
+
+```bash
+# Laravel server only
+php artisan serve
+
+# Vite dev server only
+npm run dev
+
+# Build for production
+npm run build
+```
+
+## Testing
+
+```bash
+# Run all tests
+composer test
+
+# Or directly
+php artisan test
+
+# With coverage
+php artisan test --coverage
+```
+
+## Project Structure
+
+```
+app/
+├── Enums/              # UserRole, LeaveStatus enums
+├── Http/
+│   ├── Controllers/
+│   │   ├── Admin/      # Admin-only controllers
+│   │   └── ...         # General controllers
+│   ├── Middleware/
+│   └── Requests/       # Form request validation
+├── Models/             # Eloquent models
+├── Policies/           # Authorization policies
+└── Providers/
+
+resources/js/
+├── Components/         # Reusable React components
+├── Layouts/            # Page layouts
+├── Pages/              # Inertia page components
+└── types/              # TypeScript definitions
+
+database/
+├── migrations/         # Database schema
+├── factories/          # Model factories
+└── seeders/            # Database seeders
+```
+
+## User Roles
+
+| Role       | Permissions                                      |
+|------------|--------------------------------------------------|
+| `admin`    | Full access: manage employees, departments, leave types, reports |
+| `manager`  | Approve/reject leave requests for their team     |
+| `employee` | Submit and view own leave requests               |
+
+## Key Routes
+
+| Route                  | Description                      |
+|------------------------|----------------------------------|
+| `/dashboard`           | User dashboard                   |
+| `/leave`               | Leave requests list              |
+| `/leave/create`        | Submit new leave request         |
+| `/approvals`           | Pending approvals (manager+)     |
+| `/admin/employees`     | Employee management (admin)      |
+| `/admin/departments`   | Department management (admin)    |
+| `/admin/leave-types`   | Leave type management (admin)    |
+| `/admin/reports`       | Reports & export (admin)         |
+
+## Artisan Commands
+
+```bash
+# Clear all caches
+php artisan optimize:clear
+
+# Run migrations
+php artisan migrate
+
+# Fresh migration with seeders
+php artisan migrate:fresh --seed
+
+# Generate IDE helpers (if installed)
+php artisan ide-helper:generate
+```
+
+## Code Quality
+
+```bash
+# Format PHP code
+./vendor/bin/pint
+
+# TypeScript type check
+npx tsc --noEmit
+```
+
+## Deployment
+
+A deployment script is provided:
+
+```bash
+./deployment.sh
+```
+
+For production builds:
+
+```bash
+composer install --optimize-autoloader --no-dev
+npm run build
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT License
