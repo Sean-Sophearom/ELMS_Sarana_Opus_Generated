@@ -32,6 +32,7 @@ export default function Create({ auth, leaveTypes, holidays }: LeaveCreateProps)
     });
 
     const [selectedLeaveType, setSelectedLeaveType] = useState<LeaveType | null>(null);
+    const [attachmentError, setAttachmentError] = useState<string | null>(null);
 
     // Memoize today's date to avoid recalculating on every render
     const todayStr = useMemo(() => formatLocalDate(new Date()), []);
@@ -40,6 +41,20 @@ export default function Create({ auth, leaveTypes, holidays }: LeaveCreateProps)
         setData('leave_type_id', value);
         const type = leaveTypes.find((t) => t.id === parseInt(value));
         setSelectedLeaveType(type || null);
+    };
+
+    const handleAttachmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        
+        if (file && file.size > FILE_UPLOAD.maxSize) {
+            setAttachmentError(`File size must be less than ${FILE_UPLOAD.maxSizeLabel}`);
+            setData('attachment', null);
+            e.target.value = ''; // Reset the input
+            return;
+        }
+        
+        setAttachmentError(null);
+        setData('attachment', file);
     };
 
     const submit: FormEventHandler = (e) => {
@@ -258,14 +273,14 @@ export default function Create({ auth, leaveTypes, holidays }: LeaveCreateProps)
                                     <input
                                         id="attachment"
                                         type="file"
-                                        onChange={(e) => setData('attachment', e.target.files?.[0] || null)}
+                                        onChange={handleAttachmentChange}
                                         accept={FILE_UPLOAD.acceptedExtensions}
                                         className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-orange-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-orange-700 hover:file:bg-orange-100"
                                     />
                                     <p className="mt-1 text-xs text-gray-500">
                                         Accepted formats: PDF, JPG, PNG, GIF, DOC, DOCX (max {FILE_UPLOAD.maxSizeLabel})
                                     </p>
-                                    <InputError message={errors.attachment} className="mt-2" />
+                                    <InputError message={attachmentError || errors.attachment} className="mt-2" />
                                 </div>
 
                                 {/* Submit Button */}
