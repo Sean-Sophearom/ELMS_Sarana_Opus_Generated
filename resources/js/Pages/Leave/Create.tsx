@@ -1,11 +1,19 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 import { LeaveType, Holiday, PageProps } from '@/types';
-import { FormEventHandler, useState } from 'react';
+import { FormEventHandler, useState, useMemo } from 'react';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import DatePicker from '@/Components/DatePicker';
 import { FILE_UPLOAD } from '@/constants';
+
+// Helper to format date as YYYY-MM-DD using local timezone
+const formatLocalDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
 
 interface LeaveCreateProps extends PageProps {
     leaveTypes: LeaveType[];
@@ -25,6 +33,9 @@ export default function Create({ auth, leaveTypes, holidays }: LeaveCreateProps)
 
     const [selectedLeaveType, setSelectedLeaveType] = useState<LeaveType | null>(null);
 
+    // Memoize today's date to avoid recalculating on every render
+    const todayStr = useMemo(() => formatLocalDate(new Date()), []);
+
     const handleLeaveTypeChange = (value: string) => {
         setData('leave_type_id', value);
         const type = leaveTypes.find((t) => t.id === parseInt(value));
@@ -43,20 +54,31 @@ export default function Create({ auth, leaveTypes, holidays }: LeaveCreateProps)
         if (!data.start_date || !data.end_date) return 0;
         if (data.is_half_day) return 0.5;
 
-        const start = new Date(data.start_date);
-        const end = new Date(data.end_date);
+        // Parse dates as local dates by splitting the string (avoids UTC timezone issues)
+        const [startYear, startMonth, startDay] = data.start_date.split('-').map(Number);
+        const [endYear, endMonth, endDay] = data.end_date.split('-').map(Number);
+        
+        const start = new Date(startYear, startMonth - 1, startDay);
+        const end = new Date(endYear, endMonth - 1, endDay);
+        
+        // Clone start date for iteration to avoid mutating it
+        const current = new Date(start);
         let days = 0;
 
         const holidayDates = holidays.map((h) => h.date);
 
-        while (start <= end) {
-            const dayOfWeek = start.getDay();
-            const dateStr = start.toISOString().split('T')[0];
+        while (current <= end) {
+            const dayOfWeek = current.getDay();
+            // Format date as YYYY-MM-DD using local date components
+            const year = current.getFullYear();
+            const month = String(current.getMonth() + 1).padStart(2, '0');
+            const day = String(current.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
 
             if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidayDates.includes(dateStr)) {
                 days++;
             }
-            start.setDate(start.getDate() + 1);
+            current.setDate(current.getDate() + 1);
         }
 
         return days;
@@ -178,7 +200,7 @@ export default function Create({ auth, leaveTypes, holidays }: LeaveCreateProps)
                                             id="start_date"
                                             value={data.start_date}
                                             onChange={(date) => setData('start_date', date)}
-                                            minDate={new Date().toISOString().split('T')[0]}
+                                            minDate={todayStr}
                                             holidays={holidays.map(h => h.date)}
                                             disableWeekends={true}
                                             placeholder="Select start date"
@@ -192,7 +214,7 @@ export default function Create({ auth, leaveTypes, holidays }: LeaveCreateProps)
                                             id="end_date"
                                             value={data.end_date}
                                             onChange={(date) => setData('end_date', date)}
-                                            minDate={data.start_date || new Date().toISOString().split('T')[0]}
+                                            minDate={data.start_date || todayStr}
                                             holidays={holidays.map(h => h.date)}
                                             disableWeekends={true}
                                             placeholder="Select end date"

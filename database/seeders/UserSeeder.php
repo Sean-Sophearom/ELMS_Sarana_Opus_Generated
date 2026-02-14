@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
             'role' => UserRole::ADMIN,
             'department_id' => 1, // HR
             'manager_id' => null,
-            'hire_date' => '2020-01-01',
+            'hire_date' => '2023-01-15',
             'is_active' => true,
         ]);
 
@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
             'role' => UserRole::MANAGER,
             'department_id' => 2, // IT
             'manager_id' => 1,
-            'hire_date' => '2021-03-15',
+            'hire_date' => '2024-03-15',
             'is_active' => true,
         ]);
 
@@ -46,7 +46,7 @@ class UserSeeder extends Seeder
             'role' => UserRole::MANAGER,
             'department_id' => 1, // HR
             'manager_id' => 1,
-            'hire_date' => '2021-05-20',
+            'hire_date' => '2024-05-20',
             'is_active' => true,
         ]);
 
@@ -59,7 +59,7 @@ class UserSeeder extends Seeder
             'role' => UserRole::MANAGER,
             'department_id' => 3, // Finance
             'manager_id' => 1,
-            'hire_date' => '2021-07-10',
+            'hire_date' => '2024-07-10',
             'is_active' => true,
         ]);
 
@@ -72,7 +72,7 @@ class UserSeeder extends Seeder
             'role' => UserRole::EMPLOYEE,
             'department_id' => 2, // IT
             'manager_id' => $itManager->id,
-            'hire_date' => '2022-01-10',
+            'hire_date' => '2025-01-10',
             'is_active' => true,
         ]);
 
@@ -84,7 +84,7 @@ class UserSeeder extends Seeder
             'role' => UserRole::EMPLOYEE,
             'department_id' => 2, // IT
             'manager_id' => $itManager->id,
-            'hire_date' => '2022-03-01',
+            'hire_date' => '2025-03-01',
             'is_active' => true,
         ]);
 
@@ -96,7 +96,7 @@ class UserSeeder extends Seeder
             'role' => UserRole::EMPLOYEE,
             'department_id' => 2, // IT
             'manager_id' => $itManager->id,
-            'hire_date' => '2022-06-15',
+            'hire_date' => '2025-06-15',
             'is_active' => true,
         ]);
 
@@ -109,7 +109,7 @@ class UserSeeder extends Seeder
             'role' => UserRole::EMPLOYEE,
             'department_id' => 1, // HR
             'manager_id' => $hrManager->id,
-            'hire_date' => '2022-02-20',
+            'hire_date' => '2025-02-01',
             'is_active' => true,
         ]);
 
@@ -121,7 +121,7 @@ class UserSeeder extends Seeder
             'role' => UserRole::EMPLOYEE,
             'department_id' => 1, // HR
             'manager_id' => $hrManager->id,
-            'hire_date' => '2022-08-10',
+            'hire_date' => '2025-08-10',
             'is_active' => true,
         ]);
 
@@ -134,7 +134,7 @@ class UserSeeder extends Seeder
             'role' => UserRole::EMPLOYEE,
             'department_id' => 3, // Finance
             'manager_id' => $finManager->id,
-            'hire_date' => '2022-04-05',
+            'hire_date' => '2025-04-05',
             'is_active' => true,
         ]);
 
@@ -146,7 +146,7 @@ class UserSeeder extends Seeder
             'role' => UserRole::EMPLOYEE,
             'department_id' => 3, // Finance
             'manager_id' => $finManager->id,
-            'hire_date' => '2022-09-01',
+            'hire_date' => '2025-09-01',
             'is_active' => true,
         ]);
 
@@ -158,7 +158,7 @@ class UserSeeder extends Seeder
             'role' => UserRole::EMPLOYEE,
             'department_id' => 3, // Finance
             'manager_id' => $finManager->id,
-            'hire_date' => '2023-01-15',
+            'hire_date' => '2026-01-15',
             'is_active' => true,
         ]);
     }
