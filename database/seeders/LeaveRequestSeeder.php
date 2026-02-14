@@ -104,5 +104,48 @@ class LeaveRequestSeeder extends Seeder
             'approved_by' => $currentEmployee->manager_id,
             'approved_at' => Carbon::now()->subDays(5),
         ]);
+
+        // Create leave requests for admin user
+        $admin = User::where('role', 'admin')->first();
+        if ($admin) {
+            // Past approved leave request
+            LeaveRequest::create([
+                'user_id' => $admin->id,
+                'leave_type_id' => $leaveTypes->where('code', 'AL')->first()->id,
+                'start_date' => Carbon::now()->subDays(20),
+                'end_date' => Carbon::now()->subDays(18),
+                'total_days' => 3,
+                'reason' => 'Annual vacation',
+                'status' => LeaveStatus::APPROVED,
+                'approved_by' => $admin->id, // Self-approved
+                'approved_at' => Carbon::now()->subDays(25),
+            ]);
+
+            // Recent past sick leave
+            LeaveRequest::create([
+                'user_id' => $admin->id,
+                'leave_type_id' => $leaveTypes->where('code', 'SL')->first()->id,
+                'start_date' => Carbon::now()->subDays(7),
+                'end_date' => Carbon::now()->subDays(6),
+                'total_days' => 2,
+                'reason' => 'Feeling unwell, need rest',
+                'status' => LeaveStatus::APPROVED,
+                'approved_by' => $admin->id,
+                'approved_at' => Carbon::now()->subDays(8),
+            ]);
+
+            // Upcoming approved leave
+            LeaveRequest::create([
+                'user_id' => $admin->id,
+                'leave_type_id' => $leaveTypes->where('code', 'AL')->first()->id,
+                'start_date' => Carbon::now()->addDays(14),
+                'end_date' => Carbon::now()->addDays(16),
+                'total_days' => 3,
+                'reason' => 'Family gathering',
+                'status' => LeaveStatus::APPROVED,
+                'approved_by' => $admin->id,
+                'approved_at' => Carbon::now()->subDays(2),
+            ]);
+        }
     }
 }
