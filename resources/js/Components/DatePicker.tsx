@@ -19,6 +19,12 @@ const MONTHS = [
     'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
+// Parse YYYY-MM-DD string as local date (not UTC)
+const parseLocalDate = (dateStr: string): Date => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+};
+
 export default function DatePicker({
     value,
     onChange,
@@ -34,13 +40,14 @@ export default function DatePicker({
     const [isOpen, setIsOpen] = useState(false);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(
-        value ? new Date(value) : null
+        value ? parseLocalDate(value) : null
     );
 
     useEffect(() => {
         if (value) {
-            setSelectedDate(new Date(value));
-            setCurrentMonth(new Date(value));
+            const date = parseLocalDate(value);
+            setSelectedDate(date);
+            setCurrentMonth(date);
         }
     }, [value]);
 
