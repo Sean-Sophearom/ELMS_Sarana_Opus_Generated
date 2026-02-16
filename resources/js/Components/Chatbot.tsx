@@ -66,78 +66,125 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
         };
         setMessages((prev) => [...prev, assistantMessage]);
 
-        try {
-            const response = await fetch(route('chatbot.stream'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'text/event-stream',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-                body: JSON.stringify({
-                    message: currentInput,
-                    conversation_id: conversationId,
-                }),
-            });
+        // Retry logic with exponential backoff
+        const maxRetries = 3;
+        let lastError: Error | null = null;
 
-            if (!response.ok) {
-                throw new Error('Failed to stream message');
-            }
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                const response = await fetch(route('chatbot.stream'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'text/event-stream',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    },
+                    body: JSON.stringify({
+                        message: currentInput,
+                        conversation_id: conversationId,
+                    }),
+                });
 
-            const reader = response.body?.getReader();
-            const decoder = new TextDecoder();
-            let streamedContent = '';
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => null);
+                    const errorMessage = errorData?.error || errorData?.message || response.statusText;
+                    
+                    if (response.status === 429) {
+                        throw new Error('Rate limit exceeded. Please wait a moment before trying again.');
+                    } else if (response.status === 419) {
+                        throw new Error('Session expired. Please refresh the page and try again.');
+                    } else if (response.status === 500) {
+                        throw new Error(`Server error: ${errorMessage}. Retrying... (${attempt}/${maxRetries})`);
+                    } else {
+                        throw new Error(`Request failed: ${errorMessage}`);
+                    }
+                }
 
-            if (reader) {
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
+                const reader = response.body?.getReader();
+                const decoder = new TextDecoder();
+                let streamedContent = '';
 
-                    const chunk = decoder.decode(value);
-                    const lines = chunk.split('\n');
+                if (reader) {
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
 
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            const data = line.slice(6).trim();
-                            
-                            if (data === '[DONE]') {
-                                continue;
-                            }
+                        const chunk = decoder.decode(value);
+                        const lines = chunk.split('\n');
 
-                            try {
-                                const parsed = JSON.parse(data);
+                        for (const line of lines) {
+                            if (line.startsWith('data: ')) {
+                                const data = line.slice(6).trim();
                                 
-                                // Handle text_delta events which contain the actual content
-                                if (parsed.type === 'text_delta' && parsed.delta) {
-                                    streamedContent += parsed.delta;
-                                    
-                                    // Update the assistant message with streamed content
-                                    setMessages((prev) =>
-                                        prev.map((msg) =>
-                                            msg.id === assistantMessageId
-                                                ? { ...msg, content: streamedContent }
-                                                : msg
-                                        )
-                                    );
+                                if (data === '[DONE]') {
+                                    continue;
                                 }
-                                // Handle stream_end to potentially save conversation_id
-                                // Note: Laravel AI SDK stores conversation automatically
-                            } catch (e) {
-                                // Ignore parsing errors for non-JSON lines
+
+                                try {
+                                    const parsed = JSON.parse(data);
+                                    
+                                    // Handle text_delta events which contain the actual content
+                                    if (parsed.type === 'text_delta' && parsed.delta) {
+                                        streamedContent += parsed.delta;
+                                        
+                                        // Update the assistant message with streamed content
+                                        setMessages((prev) =>
+                                            prev.map((msg) =>
+                                                msg.id === assistantMessageId
+                                                    ? { ...msg, content: streamedContent }
+                                                    : msg
+                                            )
+                                        );
+                                    }
+                                    // Handle stream_end to potentially save conversation_id
+                                    // Note: Laravel AI SDK stores conversation automatically
+                                } catch (e) {
+                                    // Ignore parsing errors for non-JSON lines
+                                }
                             }
                         }
                     }
                 }
+
+                // Success - break out of retry loop
+                setIsLoading(false);
+                return;
+
+            } catch (err) {
+                lastError = err instanceof Error ? err : new Error('An unknown error occurred');
+                console.error(`Chatbot error (attempt ${attempt}/${maxRetries}):`, err);
+
+                // If it's not a retryable error, break immediately
+                if (lastError.message.includes('Rate limit') || 
+                    lastError.message.includes('Session expired') ||
+                    attempt === maxRetries) {
+                    break;
+                }
+
+                // Wait before retrying (exponential backoff: 1s, 2s, 4s)
+                if (attempt < maxRetries) {
+                    await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt - 1)));
+                }
             }
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'An error occurred');
-            console.error('Chatbot error:', err);
+        }
+
+        // If we get here, all retries failed
+        if (lastError) {
+            const helpfulMessage = lastError.message.includes('Rate limit')
+                ? lastError.message
+                : lastError.message.includes('Session expired')
+                ? lastError.message
+                : lastError.message.includes('Network')
+                ? 'Network error. Please check your internet connection and try again.'
+                : `Unable to connect to AI assistant after ${maxRetries} attempts. ${lastError.message}\n\nPlease try again or contact support if the issue persists.`;
+            
+            setError(helpfulMessage);
             
             // Remove the empty assistant message on error
             setMessages((prev) => prev.filter((msg) => msg.id !== assistantMessageId));
-        } finally {
-            setIsLoading(false);
-        }
+        } 
+
+        setIsLoading(false);
     };
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
