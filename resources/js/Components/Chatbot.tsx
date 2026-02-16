@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
+import TextareaAutosize from 'react-textarea-autosize';
 import PrimaryButton from './PrimaryButton';
 import SecondaryButton from './SecondaryButton';
 import Modal from './Modal';
@@ -264,7 +265,7 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
                                 <p className="text-xs text-white/80">Powered by Google Gemini</p>
                             </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 items-stretch">
                             {messages.length > 0 && (
                                 <button
                                     onClick={clearConversation}
@@ -367,15 +368,16 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
 
                     {/* Input */}
                     <div className="border-t bg-white p-4">
-                        <div className="flex space-x-2">
-                            <textarea
+                        <div className="flex space-x-2 items-center">
+                            <TextareaAutosize
                                 ref={inputRef}
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyPress={handleKeyPress}
                                 placeholder="Type your message... (Press Enter to send)"
                                 className="flex-1 resize-none rounded-lg border border-gray-300 px-4 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                                rows={2}
+                                minRows={1}
+                                maxRows={4}
                                 disabled={isLoading}
                             />
                             <button
