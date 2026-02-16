@@ -190,6 +190,19 @@ php artisan route:cache
 php artisan view:cache
 ```
 
+## For inertia ssr service deployment
+
+Copy inertia-ssr.service to /etc/systemd/system and run the following commands:
+
+```bash
+# Reload systemd to recognize the new service
+sudo systemctl daemon-reload
+# Enable the inertia-ssr service to start on boot
+sudo systemctl enable inertia-ssr
+# Start the inertia-ssr service immediately
+sudo systemctl start inertia-ssr
+```
+
 ## License
 
 MIT License

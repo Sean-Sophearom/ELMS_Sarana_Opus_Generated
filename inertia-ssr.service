@@ -1,0 +1,17 @@
+[Unit]
+Description=Inertia SSR Server
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/sarana
+ExecStart=/usr/bin/php artisan inertia:start-ssr
+Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=inertia-ssr
+
+[Install]
+WantedBy=multi-user.target
