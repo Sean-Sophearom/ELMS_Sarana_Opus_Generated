@@ -4,16 +4,17 @@ A leave management application built with Laravel 12, React 18, Inertia.js, and 
 
 ## Tech Stack
 
-- **Backend:** PHP 8.2+, Laravel 12
+- **Backend:** PHP 8.4+, Laravel 12
 - **Frontend:** React 18, TypeScript, Tailwind CSS
 - **Bridge:** Inertia.js 2.0
 - **Build:** Vite 7
 - **Auth:** Laravel Breeze
 - **Routing:** Ziggy (Laravel routes in JS)
+- **AI:** Laravel AI SDK with Google Gemini
 
 ## Requirements
 
-- PHP 8.2+
+- PHP 8.4+
 - Composer
 - Node.js 18+
 - npm or yarn
@@ -46,7 +47,16 @@ DB_CONNECTION=sqlite
 
 MAIL_MAILER=smtp
 MAIL_HOST=...
+
+# AI Chatbot Configuration
+GEMINI_API_KEY=your-gemini-api-key-here
+GEMINI_MODEL=gemini-3-flash-preview # Configurable model
 ```
+
+**Get your Gemini API Key:**
+1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Create a new API key
+3. Add it to your `.env` file
 
 ### 3. Seed the Database (Optional)
 
@@ -133,6 +143,49 @@ database/
 | `manager`  | Approve/reject leave requests for their team     |
 | `employee` | Submit and view own leave requests               |
 
+## AI Chatbot Feature 🤖
+
+An intelligent AI assistant powered by **Google Gemini 2.0 Flash** is available on all authenticated pages to help users with leave management queries.
+
+### Features
+- **Conversational AI**: Natural language interaction with memory of past conversations
+- **Context-Aware**: Understands user role, department, and leave balances
+- **Rate Limited**: 20 requests per minute per user to prevent abuse
+- **Real-time Responses**: Fast, streaming responses for better UX
+- **Floating Interface**: Always accessible via floating button (bottom-right)
+
+### What the Chatbot Can Help With
+- Explaining leave policies and procedures
+- Answering questions about leave types
+- Providing guidance on how to use the system
+- General assistance with leave management
+
+### Future Enhancements (RAG-Ready)
+The chatbot is architected to support **Retrieval-Augmented Generation (RAG)**:
+- Vector database integration for policy documents
+- Similarity search for relevant leave policies
+- Enhanced context with user-specific data
+- See `docs/CHATBOT_IMPLEMENTATION.md` for details
+
+### Usage
+1. Click the floating chat button (bottom-right) on any authenticated page
+2. Type your question and press Enter
+3. Get instant AI-powered responses
+4. Conversation history is maintained per session
+
+### Configuration
+```env
+GEMINI_API_KEY=your-api-key-here
+GEMINI_MODEL=gemini-3-flash-preview # Configurable model
+```
+
+### Files
+- **Agent**: `app/Ai/Agents/ChatbotAgent.php`
+- **Controller**: `app/Http/Controllers/ChatbotController.php`
+- **Component**: `resources/js/Components/Chatbot.tsx`
+- **Routes**: `routes/web.php` (chatbot.* routes)
+- **Docs**: `docs/CHATBOT_IMPLEMENTATION.md` (full implementation guide)
+
 ## Key Routes
 
 | Route                  | Description                      |
@@ -145,6 +198,8 @@ database/
 | `/admin/departments`   | Department management (admin)    |
 | `/admin/leave-types`   | Leave type management (admin)    |
 | `/admin/reports`       | Reports & export (admin)         |
+| `/chatbot/message`     | AI chatbot message endpoint      |
+| `/chatbot/stream`      | AI chatbot streaming endpoint    |
 
 ## Artisan Commands
 

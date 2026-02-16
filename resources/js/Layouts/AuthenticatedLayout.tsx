@@ -1,4 +1,5 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import Chatbot from '@/Components/Chatbot';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
@@ -279,6 +280,9 @@ export default function Authenticated({
             )}
 
             <main>{children}</main>
+            
+            {/* AI Chatbot - Available on all authenticated pages */}
+            <Chatbot />
         </div>
     );
 }

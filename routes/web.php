@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\LeaveTypeController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\ApprovalController;
+use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\ProfileController;
@@ -37,6 +38,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/', [LeaveRequestController::class, 'store'])->name('store');
         Route::get('/{leaveRequest}', [LeaveRequestController::class, 'show'])->name('show');
         Route::post('/{leaveRequest}/cancel', [LeaveRequestController::class, 'cancel'])->name('cancel');
+    });
+
+    // Chatbot Routes (Available on all authenticated pages)
+    Route::prefix('chatbot')->name('chatbot.')->group(function () {
+        Route::post('/message', [ChatbotController::class, 'sendMessage'])->name('message');
+        Route::post('/stream', [ChatbotController::class, 'streamMessage'])->name('stream');
+        Route::get('/conversations', [ChatbotController::class, 'getConversations'])->name('conversations');
+        Route::post('/clear-rate-limit', [ChatbotController::class, 'clearRateLimit'])->name('clear-rate-limit');
     });
 
     // Approvals (for managers and admins)

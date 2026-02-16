@@ -151,7 +151,7 @@ class User extends Authenticatable
     /**
      * Get the leave balance for a specific leave type and year.
      */
-    public function getLeaveBalance(int $leaveTypeId, int $year = null): ?LeaveBalance
+    public function getLeaveBalance(int $leaveTypeId, ?int $year = null): ?LeaveBalance
     {
         $year = $year ?? now()->year;
 
