@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import TextareaAutosize from 'react-textarea-autosize';
 import PrimaryButton from './PrimaryButton';
@@ -26,6 +26,7 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
     const [error, setError] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
+    const page = usePage();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -78,7 +79,7 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'text/event-stream',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                        'X-CSRF-TOKEN': page.props.csrf_token as string || '',
                     },
                     body: JSON.stringify({
                         message: currentInput,
