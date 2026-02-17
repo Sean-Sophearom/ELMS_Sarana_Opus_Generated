@@ -42,6 +42,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_code',
     ];
 
     /**
@@ -57,6 +58,8 @@ class User extends Authenticatable
             'role' => UserRole::class,
             'hire_date' => 'date',
             'is_active' => 'boolean',
+            'two_factor_expires_at' => 'datetime',
+            'two_factor_enabled' => 'boolean',
         ];
     }
 
@@ -175,5 +178,45 @@ class User extends Authenticatable
     public function scopeRole($query, UserRole $role)
     {
         return $query->where('role', $role);
+    }
+
+    /**
+     * Generate a two-factor authentication code.
+     */
+    public function generateTwoFactorCode(): string
+    {
+        $code = str_pad((string) rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        
+        $this->two_factor_code = $code;
+        $this->two_factor_expires_at = now()->addMinutes(10);
+        $this->save();
+        
+        return $code;
+    }
+
+    /**
+     * Reset the two-factor code.
+     */
+    public function resetTwoFactorCode(): void
+    {
+        $this->two_factor_code = null;
+        $this->two_factor_expires_at = null;
+        $this->save();
+    }
+
+    /**
+     * Check if the two-factor code is valid.
+     */
+    public function validateTwoFactorCode(string $code): bool
+    {
+        if (!$this->two_factor_code || !$this->two_factor_expires_at) {
+            return false;
+        }
+
+        if ($this->two_factor_expires_at->isPast()) {
+            return false;
+        }
+
+        return hash_equals($this->two_factor_code, $code);
     }
 }
