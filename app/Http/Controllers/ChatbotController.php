@@ -124,7 +124,7 @@ class ChatbotController extends Controller
 
         // Query messages for this conversation and user
         $query = \DB::table('agent_conversation_messages')
-            ->where('conversation_id', $conversationId)
+            // ->where('conversation_id', $conversationId)
             ->where('user_id', $request->user()->id)
             ->orderBy('created_at', 'desc')
             ->orderBy('id', 'desc'); // Secondary sort for stable ordering
