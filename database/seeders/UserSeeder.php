@@ -22,6 +22,7 @@ class UserSeeder extends Seeder
             'manager_id' => null,
             'hire_date' => '2023-01-15',
             'is_active' => true,
+            'two_factor_enabled' => false,
         ]);
 
         // IT Manager
@@ -35,6 +36,7 @@ class UserSeeder extends Seeder
             'manager_id' => 1,
             'hire_date' => '2024-03-15',
             'is_active' => true,
+            'two_factor_enabled' => false,
         ]);
 
         // HR Manager
@@ -48,6 +50,7 @@ class UserSeeder extends Seeder
             'manager_id' => 1,
             'hire_date' => '2024-05-20',
             'is_active' => true,
+            'two_factor_enabled' => false,
         ]);
 
         // Finance Manager
@@ -61,6 +64,7 @@ class UserSeeder extends Seeder
             'manager_id' => 1,
             'hire_date' => '2024-07-10',
             'is_active' => true,
+            'two_factor_enabled' => false,
         ]);
 
         // IT Employees
@@ -74,6 +78,7 @@ class UserSeeder extends Seeder
             'manager_id' => $itManager->id,
             'hire_date' => '2025-01-10',
             'is_active' => true,
+            'two_factor_enabled' => false,
         ]);
 
         User::create([
@@ -86,6 +91,7 @@ class UserSeeder extends Seeder
             'manager_id' => $itManager->id,
             'hire_date' => '2025-03-01',
             'is_active' => true,
+            'two_factor_enabled' => false,
         ]);
 
         User::create([
@@ -98,6 +104,7 @@ class UserSeeder extends Seeder
             'manager_id' => $itManager->id,
             'hire_date' => '2025-06-15',
             'is_active' => true,
+            'two_factor_enabled' => false,
         ]);
 
         // HR Employees
@@ -111,6 +118,7 @@ class UserSeeder extends Seeder
             'manager_id' => $hrManager->id,
             'hire_date' => '2025-02-01',
             'is_active' => true,
+            'two_factor_enabled' => false,
         ]);
 
         User::create([
@@ -123,6 +131,7 @@ class UserSeeder extends Seeder
             'manager_id' => $hrManager->id,
             'hire_date' => '2025-08-10',
             'is_active' => true,
+            'two_factor_enabled' => false,
         ]);
 
         // Finance Employees
@@ -136,6 +145,7 @@ class UserSeeder extends Seeder
             'manager_id' => $finManager->id,
             'hire_date' => '2025-04-05',
             'is_active' => true,
+            'two_factor_enabled' => false,
         ]);
 
         User::create([
@@ -148,6 +158,7 @@ class UserSeeder extends Seeder
             'manager_id' => $finManager->id,
             'hire_date' => '2025-09-01',
             'is_active' => true,
+            'two_factor_enabled' => false,
         ]);
 
         User::create([
@@ -160,6 +171,7 @@ class UserSeeder extends Seeder
             'manager_id' => $finManager->id,
             'hire_date' => '2026-01-15',
             'is_active' => true,
+            'two_factor_enabled' => false,
         ]);
     }
 }

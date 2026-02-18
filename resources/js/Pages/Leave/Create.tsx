@@ -275,7 +275,7 @@ export default function Create({ auth, leaveTypes, holidays }: LeaveCreateProps)
                                         type="file"
                                         onChange={handleAttachmentChange}
                                         accept={FILE_UPLOAD.acceptedExtensions}
-                                        className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-orange-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-orange-700 hover:file:bg-orange-100"
+                                        className="mt-1 cursor-pointer block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-orange-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-orange-700 hover:file:bg-orange-100"
                                     />
                                     <p className="mt-1 text-xs text-gray-500">
                                         Accepted formats: PDF, JPG, PNG, GIF, DOC, DOCX (max {FILE_UPLOAD.maxSizeLabel})
