@@ -1,6 +1,6 @@
 git pull
 composer install --no-dev --optimize-autoloader
-php aritsan migrate --force
+php artisan migrate --force
 npm ci
 sudo npm run build
 
