@@ -60,12 +60,12 @@ class ReportController extends Controller
             ->get();
 
         // Monthly trend
-        $monthlyTrend = LeaveRequest::selectRaw('MONTH(start_date) as month')
+        $monthlyTrend = LeaveRequest::selectRaw('EXTRACT(MONTH FROM start_date) as month')
             ->selectRaw('SUM(total_days) as total_days')
             ->selectRaw('COUNT(*) as request_count')
             ->whereYear('start_date', $year)
             ->where('status', LeaveStatus::APPROVED)
-            ->groupBy(DB::raw('MONTH(start_date)'))
+            ->groupBy(DB::raw('EXTRACT(MONTH FROM start_date)'))
             ->orderBy('month')
             ->get()
             ->keyBy('month');
