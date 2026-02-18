@@ -58,21 +58,7 @@ export default function Index({ auth, employees, departments, roles, filters }: 
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Employees
-                    </h2>
-                    <Link
-                        href={route('admin.employees.create')}
-                        className="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-500"
-                    >
-                        Add Employee
-                    </Link>
-                </div>
-            }
-        >
+        <>
             <Head title="Employees" />
 
             <div className="py-12">
@@ -259,6 +245,26 @@ export default function Index({ auth, employees, departments, roles, filters }: 
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Index.layout = (page: React.ReactNode) => (
+    <AuthenticatedLayout
+        header={
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Employees
+                </h2>
+                <Link
+                    href={route('admin.employees.create')}
+                    className="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-500"
+                >
+                    Add Employee
+                </Link>
+            </div>
+        }
+    >
+        {page}
+    </AuthenticatedLayout>
+);

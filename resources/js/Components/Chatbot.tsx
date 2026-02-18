@@ -1,14 +1,14 @@
-import { useState, useRef, useEffect } from 'react';
-import { router, usePage } from '@inertiajs/react';
-import axios from 'axios';
-import TextareaAutosize from 'react-textarea-autosize';
-import PrimaryButton from './PrimaryButton';
-import SecondaryButton from './SecondaryButton';
-import Modal from './Modal';
+import { useState, useRef, useEffect, useMemo, memo } from "react";
+import { router, usePage } from "@inertiajs/react";
+import axios from "axios";
+import TextareaAutosize from "react-textarea-autosize";
+import PrimaryButton from "./PrimaryButton";
+import SecondaryButton from "./SecondaryButton";
+import Modal from "./Modal";
 
 interface Message {
     id: string;
-    role: 'user' | 'assistant';
+    role: "user" | "assistant";
     content: string;
     timestamp: Date;
 }
@@ -17,54 +17,140 @@ interface ChatbotProps {
     className?: string;
 }
 
-export default function Chatbot({ className = '' }: ChatbotProps) {
+export default memo(Chatbot);
+
+function Chatbot({ className = "" }: ChatbotProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
-    const [input, setInput] = useState('');
+    const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [conversationId, setConversationId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+    const [hasMoreHistory, setHasMoreHistory] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const page = usePage();
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    useEffect(() => {
-        scrollToBottom();
+    // Ensure messages are always sorted correctly by timestamp, then by ID
+    const sortedMessages = useMemo(() => {
+        return [...messages].sort((a, b) => {
+            const timeDiff = a.timestamp.getTime() - b.timestamp.getTime();
+            if (timeDiff !== 0) return timeDiff;
+            // If timestamps are identical, sort by ID
+            return a.id.localeCompare(b.id);
+        });
     }, [messages]);
+
+    const scrollToBottom = (behavior: "smooth" | "auto" = "auto") => {
+        messagesEndRef.current?.scrollIntoView({ behavior: behavior });
+    };
 
     useEffect(() => {
         if (isOpen && inputRef.current) {
             inputRef.current.focus();
         }
+
+        // Load existing conversation when chatbot opens
+        if (isOpen && !conversationId && messages.length === 0) {
+            loadConversation();
+        }
     }, [isOpen]);
+
+    const loadConversation = async () => {
+        try {
+            const response = await axios.get(route("chatbot.conversations"));
+            if (response.data.conversation) {
+                setConversationId(response.data.conversation.id);
+                // Load initial messages for this conversation
+                await loadMessages(response.data.conversation.id);
+                requestAnimationFrame(() => scrollToBottom());
+            }
+        } catch (err) {
+            console.error("Failed to load conversation:", err);
+        }
+    };
+
+    const loadMessages = async (convId: string, beforeId?: string) => {
+        if (isLoadingHistory) return;
+
+        setIsLoadingHistory(true);
+        try {
+            const params: any = {
+                conversation_id: convId,
+                limit: 20,
+            };
+            if (beforeId) {
+                params.before_id = beforeId;
+            }
+
+            const response = await axios.get(route("chatbot.messages"), {
+                params,
+            });
+            const loadedMessages = response.data.messages.map((msg: any) => ({
+                ...msg,
+                timestamp: new Date(msg.timestamp),
+            }));
+
+            if (beforeId) {
+                // Prepend older messages
+                setMessages((prev) => [...loadedMessages, ...prev]);
+            } else {
+                // Initial load
+                setMessages(loadedMessages);
+            }
+
+            setHasMoreHistory(response.data.has_more);
+        } catch (err) {
+            console.error("Failed to load messages:", err);
+        } finally {
+            setIsLoadingHistory(false);
+        }
+    };
+
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const { scrollTop } = e.currentTarget;
+
+        // Load more when scrolled near the top
+        if (
+            scrollTop < 100 &&
+            hasMoreHistory &&
+            !isLoadingHistory &&
+            conversationId
+        ) {
+            const oldestMessage = sortedMessages[0];
+            if (oldestMessage) {
+                loadMessages(conversationId, oldestMessage.id);
+            }
+        }
+    };
 
     const sendMessage = async () => {
         if (!input.trim() || isLoading) return;
 
+        const now = Date.now();
         const userMessage: Message = {
-            id: Date.now().toString(),
-            role: 'user',
+            id: now.toString(),
+            role: "user",
             content: input,
-            timestamp: new Date(),
+            timestamp: new Date(now),
         };
 
         setMessages((prev) => [...prev, userMessage]);
         const currentInput = input;
-        setInput('');
+        setInput("");
         setIsLoading(true);
         setError(null);
 
         // Create a placeholder for the assistant's streaming message
-        const assistantMessageId = (Date.now() + 1).toString();
+        // Use a slightly later timestamp to ensure proper ordering
+        const assistantMessageId = (now + 1).toString();
         const assistantMessage: Message = {
             id: assistantMessageId,
-            role: 'assistant',
-            content: '',
-            timestamp: new Date(),
+            role: "assistant",
+            content: "",
+            timestamp: new Date(now + 1),
         };
         setMessages((prev) => [...prev, assistantMessage]);
 
@@ -74,12 +160,12 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
 
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                const response = await fetch(route('chatbot.stream'), {
-                    method: 'POST',
+                const response = await fetch(route("chatbot.stream"), {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'text/event-stream',
-                        'X-CSRF-TOKEN': page.props.csrf_token as string || '',
+                        "Content-Type": "application/json",
+                        Accept: "text/event-stream",
+                        "X-CSRF-TOKEN": (page.props.csrf_token as string) || "",
                     },
                     body: JSON.stringify({
                         message: currentInput,
@@ -89,14 +175,23 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => null);
-                    const errorMessage = errorData?.error || errorData?.message || response.statusText;
-                    
+                    const errorMessage =
+                        errorData?.error ||
+                        errorData?.message ||
+                        response.statusText;
+
                     if (response.status === 429) {
-                        throw new Error('Rate limit exceeded. Please wait a moment before trying again.');
+                        throw new Error(
+                            "Rate limit exceeded. Please wait a moment before trying again.",
+                        );
                     } else if (response.status === 419) {
-                        throw new Error('Session expired. Please refresh the page and try again.');
+                        throw new Error(
+                            "Session expired. Please refresh the page and try again.",
+                        );
                     } else if (response.status === 500) {
-                        throw new Error(`Server error: ${errorMessage}. Retrying... (${attempt}/${maxRetries})`);
+                        throw new Error(
+                            `Server error: ${errorMessage}. Retrying... (${attempt}/${maxRetries})`,
+                        );
                     } else {
                         throw new Error(`Request failed: ${errorMessage}`);
                     }
@@ -104,7 +199,8 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
 
                 const reader = response.body?.getReader();
                 const decoder = new TextDecoder();
-                let streamedContent = '';
+                let streamedContent = "";
+                let currentConversationId = conversationId;
 
                 if (reader) {
                     while (true) {
@@ -112,34 +208,51 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
                         if (done) break;
 
                         const chunk = decoder.decode(value);
-                        const lines = chunk.split('\n');
+                        const lines = chunk.split("\n");
 
                         for (const line of lines) {
-                            if (line.startsWith('data: ')) {
+                            if (line.startsWith("data: ")) {
                                 const data = line.slice(6).trim();
-                                
-                                if (data === '[DONE]') {
+
+                                if (data === "[DONE]") {
                                     continue;
                                 }
 
                                 try {
                                     const parsed = JSON.parse(data);
-                                    
+
                                     // Handle text_delta events which contain the actual content
-                                    if (parsed.type === 'text_delta' && parsed.delta) {
+                                    if (
+                                        parsed.type === "text_delta" &&
+                                        parsed.delta
+                                    ) {
                                         streamedContent += parsed.delta;
-                                        
+
                                         // Update the assistant message with streamed content
                                         setMessages((prev) =>
                                             prev.map((msg) =>
                                                 msg.id === assistantMessageId
-                                                    ? { ...msg, content: streamedContent }
-                                                    : msg
-                                            )
+                                                    ? {
+                                                          ...msg,
+                                                          content:
+                                                              streamedContent,
+                                                      }
+                                                    : msg,
+                                            ),
                                         );
                                     }
-                                    // Handle stream_end to potentially save conversation_id
-                                    // Note: Laravel AI SDK stores conversation automatically
+
+                                    // Capture conversation_id from the stream
+                                    if (
+                                        parsed.conversationId &&
+                                        !currentConversationId
+                                    ) {
+                                        currentConversationId =
+                                            parsed.conversationId;
+                                        setConversationId(
+                                            parsed.conversationId,
+                                        );
+                                    }
                                 } catch (e) {
                                     // Ignore parsing errors for non-JSON lines
                                 }
@@ -151,46 +264,57 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
                 // Success - break out of retry loop
                 setIsLoading(false);
                 return;
-
             } catch (err) {
-                lastError = err instanceof Error ? err : new Error('An unknown error occurred');
-                console.error(`Chatbot error (attempt ${attempt}/${maxRetries}):`, err);
+                lastError =
+                    err instanceof Error
+                        ? err
+                        : new Error("An unknown error occurred");
+                console.error(
+                    `Chatbot error (attempt ${attempt}/${maxRetries}):`,
+                    err,
+                );
 
                 // If it's not a retryable error, break immediately
-                if (lastError.message.includes('Rate limit') || 
-                    lastError.message.includes('Session expired') ||
-                    attempt === maxRetries) {
+                if (
+                    lastError.message.includes("Rate limit") ||
+                    lastError.message.includes("Session expired") ||
+                    attempt === maxRetries
+                ) {
                     break;
                 }
 
                 // Wait before retrying (exponential backoff: 1s, 2s, 4s)
                 if (attempt < maxRetries) {
-                    await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt - 1)));
+                    await new Promise((resolve) =>
+                        setTimeout(resolve, 1000 * Math.pow(2, attempt - 1)),
+                    );
                 }
             }
         }
 
         // If we get here, all retries failed
         if (lastError) {
-            const helpfulMessage = lastError.message.includes('Rate limit')
+            const helpfulMessage = lastError.message.includes("Rate limit")
                 ? lastError.message
-                : lastError.message.includes('Session expired')
-                ? lastError.message
-                : lastError.message.includes('Network')
-                ? 'Network error. Please check your internet connection and try again.'
-                : `Unable to connect to AI assistant after ${maxRetries} attempts. ${lastError.message}\n\nPlease try again or contact support if the issue persists.`;
-            
+                : lastError.message.includes("Session expired")
+                  ? lastError.message
+                  : lastError.message.includes("Network")
+                    ? "Network error. Please check your internet connection and try again."
+                    : `Unable to connect to AI assistant after ${maxRetries} attempts. ${lastError.message}\n\nPlease try again or contact support if the issue persists.`;
+
             setError(helpfulMessage);
-            
+
             // Remove the empty assistant message on error
-            setMessages((prev) => prev.filter((msg) => msg.id !== assistantMessageId));
-        } 
+            setMessages((prev) =>
+                prev.filter((msg) => msg.id !== assistantMessageId),
+            );
+        }
 
         setIsLoading(false);
     };
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
         }
@@ -200,12 +324,13 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
         setMessages([]);
         setConversationId(null);
         setError(null);
+        setHasMoreHistory(false);
     };
 
     const formatTime = (date: Date) => {
-        return new Intl.DateTimeFormat('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
+        return new Intl.DateTimeFormat("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
             hour12: true,
         }).format(date);
     };
@@ -234,13 +359,17 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
                 </svg>
                 {messages.length > 0 && (
                     <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold">
-                        {messages.filter((m) => m.role === 'assistant').length}
+                        {messages.filter((m) => m.role === "assistant").length}
                     </span>
                 )}
             </button>
 
             {/* Chatbot Modal */}
-            <Modal show={isOpen} onClose={() => setIsOpen(false)} maxWidth="2xl">
+            <Modal
+                show={isOpen}
+                onClose={() => setIsOpen(false)}
+                maxWidth="2xl"
+            >
                 <div className="flex h-[600px] flex-col">
                     {/* Header */}
                     <div className="flex items-center justify-between border-b bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 text-white">
@@ -262,12 +391,16 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
                                 </svg>
                             </div>
                             <div>
-                                <h2 className="text-lg font-semibold">AI Assistant</h2>
-                                <p className="text-xs text-white/80">Powered by Google Gemini</p>
+                                <h2 className="text-lg font-semibold">
+                                    AI Assistant
+                                </h2>
+                                <p className="text-xs text-white/80">
+                                    Powered by Google Gemini
+                                </p>
                             </div>
                         </div>
-                        <div className="flex items-center space-x-2 items-stretch">
-                            {messages.length > 0 && (
+                        <div className="flex items-center space-x-2">
+                            {/* {messages.length > 0 && (
                                 <button
                                     onClick={clearConversation}
                                     className="rounded-lg bg-white/20 px-3 py-1 text-sm hover:bg-white/30 focus:outline-none"
@@ -275,7 +408,7 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
                                 >
                                     Clear
                                 </button>
-                            )}
+                            )} */}
                             <button
                                 onClick={() => setIsOpen(false)}
                                 className="rounded-lg bg-white/20 p-2 hover:bg-white/30 focus:outline-none"
@@ -288,15 +421,32 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
                                     stroke="currentColor"
                                     className="h-5 w-5"
                                 >
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
                                 </svg>
                             </button>
                         </div>
                     </div>
 
                     {/* Messages */}
-                    <div className="flex-1 overflow-y-auto bg-gray-50 p-4 space-y-4">
-                        {messages.length === 0 ? (
+                    <div
+                        ref={messagesContainerRef}
+                        onScroll={handleScroll}
+                        className="flex-1 overflow-y-auto bg-gray-50 p-4 space-y-4"
+                    >
+                        {isLoadingHistory && (
+                            <div className="flex justify-center py-2">
+                                <div className="flex space-x-2">
+                                    <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-400 [animation-delay:-0.3s]"></div>
+                                    <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-400 [animation-delay:-0.15s]"></div>
+                                    <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-400"></div>
+                                </div>
+                            </div>
+                        )}
+                        {messages.length === 0 && !isLoadingHistory ? (
                             <div className="flex h-full flex-col items-center justify-center text-center">
                                 <div className="mb-4 rounded-full bg-indigo-100 p-6">
                                     <svg
@@ -314,29 +464,36 @@ export default function Chatbot({ className = '' }: ChatbotProps) {
                                         />
                                     </svg>
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900">Welcome to AI Assistant!</h3>
+                                <h3 className="text-lg font-semibold text-gray-900">
+                                    Welcome to AI Assistant!
+                                </h3>
                                 <p className="mt-2 max-w-sm text-sm text-gray-600">
-                                    Ask me anything about leave management, policies, or how to use the system.
+                                    Ask me anything about leave management,
+                                    policies, or how to use the system.
                                 </p>
                             </div>
                         ) : (
                             <>
-                                {messages.map((message) => (
+                                {sortedMessages.map((message) => (
                                     <div
                                         key={message.id}
-                                        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                                     >
                                         <div
                                             className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                                                message.role === 'user'
-                                                    ? 'bg-indigo-600 text-white'
-                                                    : 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                                                message.role === "user"
+                                                    ? "bg-indigo-600 text-white"
+                                                    : "bg-white text-gray-900 shadow-sm border border-gray-200"
                                             }`}
                                         >
-                                            <p className="whitespace-pre-wrap text-sm">{message.content}</p>
+                                            <p className="whitespace-pre-wrap text-sm">
+                                                {message.content}
+                                            </p>
                                             <p
                                                 className={`mt-1 text-xs ${
-                                                    message.role === 'user' ? 'text-indigo-200' : 'text-gray-500'
+                                                    message.role === "user"
+                                                        ? "text-indigo-200"
+                                                        : "text-gray-500"
                                                 }`}
                                             >
                                                 {formatTime(message.timestamp)}

@@ -73,21 +73,7 @@ export default function Show({ auth, leaveRequest }: LeaveShowProps) {
     const attachmentFilename = leaveRequest.attachment?.split('/').pop() || leaveRequest.attachment_name;
 
     return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Leave Request Details
-                    </h2>
-                    <Link
-                        href={route('leave.index')}
-                        className="text-sm font-medium text-orange-600 hover:text-orange-500"
-                    >
-                        Back to My Requests
-                    </Link>
-                </div>
-            }
-        >
+        <>
             <Head title="Leave Request Details" />
 
             <div className="py-12">
@@ -231,6 +217,26 @@ export default function Show({ auth, leaveRequest }: LeaveShowProps) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Show.layout = (page: React.ReactNode) => (
+    <AuthenticatedLayout
+        header={
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Leave Request Details
+                </h2>
+                <Link
+                    href={route('leave.index')}
+                    className="text-sm font-medium text-orange-600 hover:text-orange-500"
+                >
+                    Back to My Requests
+                </Link>
+            </div>
+        }
+    >
+        {page}
+    </AuthenticatedLayout>
+);

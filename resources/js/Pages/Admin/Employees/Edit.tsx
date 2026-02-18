@@ -62,21 +62,7 @@ export default function Edit({ auth, employee, departments, managers, roles }: E
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Edit Employee
-                    </h2>
-                    <Link
-                        href={route('admin.employees.index')}
-                        className="text-sm font-medium text-orange-600 hover:text-orange-500"
-                    >
-                        Back to Employees
-                    </Link>
-                </div>
-            }
-        >
+        <>
             <Head title="Edit Employee" />
 
             <div className="py-12">
@@ -249,6 +235,26 @@ export default function Edit({ auth, employee, departments, managers, roles }: E
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Edit.layout = (page: React.ReactNode) => (
+    <AuthenticatedLayout
+        header={
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Edit Employee
+                </h2>
+                <Link
+                    href={route('admin.employees.index')}
+                    className="text-sm font-medium text-orange-600 hover:text-orange-500"
+                >
+                    Back to Employees
+                </Link>
+            </div>
+        }
+    >
+        {page}
+    </AuthenticatedLayout>
+);

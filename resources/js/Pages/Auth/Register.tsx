@@ -193,3 +193,5 @@ export default function Register() {
         </>
     );
 }
+
+Register.layout = (page: React.ReactNode) => page;

@@ -85,6 +85,18 @@ INSTRUCTIONS;
     }
     
     /**
+     * Configure conversation memory (limit context to save costs).
+     * Only sends the most recent N messages to the AI, but stores all messages in DB.
+     */
+    public function conversationMemory(): int
+    {
+        // Only include the last 10 messages (5 exchanges) in the AI context
+        // This keeps costs down while still providing reasonable context
+        // All messages are still stored and visible to the user
+        return 10;
+    }
+    
+    /**
      * Get additional provider-specific options.
      */
     public function providerOptions(): array

@@ -12,13 +12,7 @@ export default function Edit({
     twoFactorEnabled,
 }: PageProps<{ mustVerifyEmail: boolean; status?: string; twoFactorEnabled: boolean }>) {
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Profile
-                </h2>
-            }
-        >
+        <>
             <Head title="Profile" />
 
             <div className="py-12">
@@ -47,6 +41,18 @@ export default function Edit({
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Edit.layout = (page: React.ReactNode) => (
+    <AuthenticatedLayout
+        header={
+            <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                Profile
+            </h2>
+        }
+    >
+        {page}
+    </AuthenticatedLayout>
+);

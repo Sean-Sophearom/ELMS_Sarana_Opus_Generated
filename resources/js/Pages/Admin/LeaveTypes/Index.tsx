@@ -27,21 +27,7 @@ export default function Index({ auth, leaveTypes }: LeaveTypesIndexProps) {
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Leave Types
-                    </h2>
-                    <Link
-                        href={route('admin.leave-types.create')}
-                        className="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-500"
-                    >
-                        Add Leave Type
-                    </Link>
-                </div>
-            }
-        >
+        <>
             <Head title="Leave Types" />
 
             <div className="py-12">
@@ -152,6 +138,26 @@ export default function Index({ auth, leaveTypes }: LeaveTypesIndexProps) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Index.layout = (page: React.ReactNode) => (
+    <AuthenticatedLayout
+        header={
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Leave Types
+                </h2>
+                <Link
+                    href={route('admin.leave-types.create')}
+                    className="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-500"
+                >
+                    Add Leave Type
+                </Link>
+            </div>
+        }
+    >
+        {page}
+    </AuthenticatedLayout>
+);

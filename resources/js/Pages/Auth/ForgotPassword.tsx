@@ -54,3 +54,5 @@ export default function ForgotPassword({ status }: { status?: string }) {
         </GuestLayout>
     );
 }
+
+ForgotPassword.layout = (page: React.ReactNode) => page;

@@ -51,13 +51,7 @@ export default function Index({ auth, approvals, filters }: ApprovalsIndexProps)
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Leave Approvals
-                </h2>
-            }
-        >
+        <>
             <Head title="Leave Approvals" />
 
             <div className="py-12">
@@ -206,6 +200,18 @@ export default function Index({ auth, approvals, filters }: ApprovalsIndexProps)
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Index.layout = (page: React.ReactNode) => (
+    <AuthenticatedLayout
+        header={
+            <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                Leave Approvals
+            </h2>
+        }
+    >
+        {page}
+    </AuthenticatedLayout>
+);

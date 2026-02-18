@@ -46,6 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/message', [ChatbotController::class, 'sendMessage'])->name('message');
         Route::post('/stream', [ChatbotController::class, 'streamMessage'])->name('stream');
         Route::get('/conversations', [ChatbotController::class, 'getConversations'])->name('conversations');
+        Route::get('/messages', [ChatbotController::class, 'getMessages'])->name('messages');
         Route::post('/clear-rate-limit', [ChatbotController::class, 'clearRateLimit'])->name('clear-rate-limit');
     });
 

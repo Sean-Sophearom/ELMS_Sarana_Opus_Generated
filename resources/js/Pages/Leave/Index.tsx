@@ -38,21 +38,7 @@ export default function Index({
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        My Leave Requests
-                    </h2>
-                    <Link
-                        href={route('leave.create')}
-                        className="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-500"
-                    >
-                        Apply for Leave
-                    </Link>
-                </div>
-            }
-        >
+        <>
             <Head title="My Leave Requests" />
 
             <div className="py-12">
@@ -236,6 +222,26 @@ export default function Index({
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Index.layout = (page: React.ReactNode) => (
+    <AuthenticatedLayout
+        header={
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    My Leave Requests
+                </h2>
+                <Link
+                    href={route('leave.create')}
+                    className="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-500"
+                >
+                    Apply for Leave
+                </Link>
+            </div>
+        }
+    >
+        {page}
+    </AuthenticatedLayout>
+);

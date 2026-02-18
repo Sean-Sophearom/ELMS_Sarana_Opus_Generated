@@ -54,3 +54,5 @@ export default function ConfirmPassword() {
         </GuestLayout>
     );
 }
+
+ConfirmPassword.layout = (page: React.ReactNode) => page;

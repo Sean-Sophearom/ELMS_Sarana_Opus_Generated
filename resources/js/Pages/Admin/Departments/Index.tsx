@@ -37,21 +37,7 @@ export default function Index({ auth, departments, filters }: DepartmentsIndexPr
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Departments
-                    </h2>
-                    <Link
-                        href={route('admin.departments.create')}
-                        className="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-500"
-                    >
-                        Add Department
-                    </Link>
-                </div>
-            }
-        >
+        <>
             <Head title="Departments" />
 
             <div className="py-12">
@@ -148,6 +134,26 @@ export default function Index({ auth, departments, filters }: DepartmentsIndexPr
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Index.layout = (page: React.ReactNode) => (
+    <AuthenticatedLayout
+        header={
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Departments
+                </h2>
+                <Link
+                    href={route('admin.departments.create')}
+                    className="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-500"
+                >
+                    Add Department
+                </Link>
+            </div>
+        }
+    >
+        {page}
+    </AuthenticatedLayout>
+);

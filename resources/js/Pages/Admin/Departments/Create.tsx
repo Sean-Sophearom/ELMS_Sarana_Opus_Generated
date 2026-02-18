@@ -20,21 +20,7 @@ export default function Create({ auth }: PageProps) {
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Add Department
-                    </h2>
-                    <Link
-                        href={route('admin.departments.index')}
-                        className="text-sm font-medium text-orange-600 hover:text-orange-500"
-                    >
-                        Back to Departments
-                    </Link>
-                </div>
-            }
-        >
+        <>
             <Head title="Add Department" />
 
             <div className="py-12">
@@ -114,6 +100,26 @@ export default function Create({ auth }: PageProps) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Create.layout = (page: React.ReactNode) => (
+    <AuthenticatedLayout
+        header={
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Add Department
+                </h2>
+                <Link
+                    href={route('admin.departments.index')}
+                    className="text-sm font-medium text-orange-600 hover:text-orange-500"
+                >
+                    Back to Departments
+                </Link>
+            </div>
+        }
+    >
+        {page}
+    </AuthenticatedLayout>
+);

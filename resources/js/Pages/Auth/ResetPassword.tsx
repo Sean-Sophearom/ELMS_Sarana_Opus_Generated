@@ -98,3 +98,5 @@ export default function ResetPassword({
         </GuestLayout>
     );
 }
+
+ResetPassword.layout = (page: React.ReactNode) => page;

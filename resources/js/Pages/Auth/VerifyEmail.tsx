@@ -49,3 +49,5 @@ export default function VerifyEmail({ status }: { status?: string }) {
         </GuestLayout>
     );
 }
+
+VerifyEmail.layout = (page: React.ReactNode) => page;

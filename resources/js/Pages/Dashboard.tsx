@@ -30,13 +30,7 @@ export default function Dashboard({
     isManager,
 }: DashboardProps) {
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Dashboard
-                </h2>
-            }
-        >
+        <>
             <Head title="Dashboard" />
 
             <div className="py-12">
@@ -214,6 +208,18 @@ export default function Dashboard({
                     )}
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Dashboard.layout = (page: React.ReactNode) => (
+    <AuthenticatedLayout
+        header={
+            <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                Dashboard
+            </h2>
+        }
+    >
+        {page}
+    </AuthenticatedLayout>
+);

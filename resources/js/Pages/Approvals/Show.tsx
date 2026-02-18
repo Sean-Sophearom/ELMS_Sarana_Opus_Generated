@@ -62,21 +62,7 @@ export default function Show({ auth, leaveRequest, leaveHistory, balance }: Appr
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Review Leave Request
-                    </h2>
-                    <Link
-                        href={route('approvals.index')}
-                        className="text-sm font-medium text-orange-600 hover:text-orange-500"
-                    >
-                        Back to Approvals
-                    </Link>
-                </div>
-            }
-        >
+        <>
             <Head title="Review Leave Request" />
 
             <div className="py-12">
@@ -336,6 +322,26 @@ export default function Show({ auth, leaveRequest, leaveHistory, balance }: Appr
                     </div>
                 </div>
             )}
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Show.layout = (page: React.ReactNode) => (
+    <AuthenticatedLayout
+        header={
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Review Leave Request
+                </h2>
+                <Link
+                    href={route('approvals.index')}
+                    className="text-sm font-medium text-orange-600 hover:text-orange-500"
+                >
+                    Back to Approvals
+                </Link>
+            </div>
+        }
+    >
+        {page}
+    </AuthenticatedLayout>
+);

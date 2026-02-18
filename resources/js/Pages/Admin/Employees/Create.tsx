@@ -48,21 +48,7 @@ export default function Create({ auth, departments, managers, roles }: CreateEmp
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Add Employee
-                    </h2>
-                    <Link
-                        href={route('admin.employees.index')}
-                        className="text-sm font-medium text-orange-600 hover:text-orange-500"
-                    >
-                        Back to Employees
-                    </Link>
-                </div>
-            }
-        >
+        <>
             <Head title="Add Employee" />
 
             <div className="py-12">
@@ -246,6 +232,26 @@ export default function Create({ auth, departments, managers, roles }: CreateEmp
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Create.layout = (page: React.ReactNode) => (
+    <AuthenticatedLayout
+        header={
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Add Employee
+                </h2>
+                <Link
+                    href={route('admin.employees.index')}
+                    className="text-sm font-medium text-orange-600 hover:text-orange-500"
+                >
+                    Back to Employees
+                </Link>
+            </div>
+        }
+    >
+        {page}
+    </AuthenticatedLayout>
+);

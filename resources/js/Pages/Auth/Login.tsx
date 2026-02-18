@@ -170,3 +170,5 @@ export default function Login({
         </>
     );
 }
+
+Login.layout = (page: React.ReactNode) => page;

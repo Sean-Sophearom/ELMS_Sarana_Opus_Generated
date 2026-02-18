@@ -61,26 +61,7 @@ export default function Index({
     const maxMonthDays = Math.max(...monthlyTrend.map(m => m.total_days), 1);
 
     return (
-        <AuthenticatedLayout
-            header={
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Reports & Analytics
-                    </h2>
-                    <select
-                        value={selectedYear}
-                        onChange={(e) => handleYearChange(parseInt(e.target.value))}
-                        className="rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
-                    >
-                        {years.map((y) => (
-                            <option key={y} value={y}>
-                                {y}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            }
-        >
+        <>
             <Head title="Reports" />
 
             <div className="py-12">
@@ -268,6 +249,20 @@ export default function Index({
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </>
     );
 }
+
+Index.layout = (page: React.ReactNode) => (
+    <AuthenticatedLayout
+        header={
+            <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Reports & Analytics
+                </h2>
+            </div>
+        }
+    >
+        {page}
+    </AuthenticatedLayout>
+);

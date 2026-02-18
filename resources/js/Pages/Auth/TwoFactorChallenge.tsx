@@ -158,3 +158,5 @@ export default function TwoFactorChallenge({
         </>
     );
 }
+
+TwoFactorChallenge.layout = (page: React.ReactNode) => page;

@@ -89,9 +89,74 @@ class ChatbotController extends Controller
             return response()->json(['error' => 'Too many requests.'], 429);
         }
         RateLimiter::hit($key, 60);
-        return (new ChatbotAgent($request->user()))
-            ->withContext($this->getUserContext($request->user()))
+        
+        $agent = new ChatbotAgent($request->user());
+        $agent->withContext($this->getUserContext($request->user()));
+        
+        // Continue existing conversation if ID provided
+        if ($request->conversation_id) {
+            return $agent
+                ->continue($request->conversation_id, as: $request->user())
+                ->stream($request->message);
+        }
+        
+        // Start new conversation
+        return $agent
+            ->forUser($request->user())
             ->stream($request->message);
+    }
+
+    /**
+     * Get message history with pagination for infinite scroll.
+     * Returns messages in reverse chronological order (newest first).
+     */
+    public function getMessages(Request $request)
+    {
+        $request->validate([
+            'conversation_id' => 'required|string',
+            'before_id' => 'nullable|string', // For pagination - load messages before this ID
+            'limit' => 'nullable|integer|min:1|max:100',
+        ]);
+
+        $limit = $request->input('limit', 20);
+        $conversationId = $request->input('conversation_id');
+        $beforeId = $request->input('before_id');
+
+        // Query messages for this conversation and user
+        $query = \DB::table('agent_conversation_messages')
+            ->where('conversation_id', $conversationId)
+            ->where('user_id', $request->user()->id)
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc'); // Secondary sort for stable ordering
+
+        // Pagination: load messages created before the given message
+        if ($beforeId) {
+            $beforeMessage = \DB::table('agent_conversation_messages')
+                ->where('id', $beforeId)
+                ->first();
+            
+            if ($beforeMessage) {
+                $query->where('created_at', '<=', $beforeMessage->created_at)
+                    ->where('id', '<', $beforeId); // Use ID comparison for same-second messages
+            }
+        }
+
+        $messages = $query->limit($limit)->get();
+
+        // Transform messages to frontend format
+        $formattedMessages = $messages->map(function ($msg) {
+            return [
+                'id' => $msg->id,
+                'role' => $msg->role,
+                'content' => $msg->content,
+                'timestamp' => $msg->created_at,
+            ];
+        })->reverse()->values(); // Reverse to show oldest first in the batch
+
+        return response()->json([
+            'messages' => $formattedMessages,
+            'has_more' => $messages->count() == $limit,
+        ]);
     }
 
     /**
@@ -124,10 +189,18 @@ class ChatbotController extends Controller
      */
     public function getConversations(Request $request)
     {
-        // This would query the agent_conversations table
-        // For now, return empty array as conversations are managed by the agent
+        // Get the most recent conversation for this user
+        $conversation = \DB::table('agent_conversations')
+            ->where('user_id', $request->user()->id)
+            ->orderBy('updated_at', 'desc')
+            ->first();
+
         return response()->json([
-            'conversations' => [],
+            'conversation' => $conversation ? [
+                'id' => $conversation->id,
+                'title' => $conversation->title,
+                'updated_at' => $conversation->updated_at,
+            ] : null,
         ]);
     }
 

@@ -287,3 +287,5 @@ export default function Welcome({ auth }: PageProps) {
         </>
     );
 }
+
+Welcome.layout = (page: React.ReactNode) => page;
