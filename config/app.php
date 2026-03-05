@@ -123,4 +123,14 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    | The single source of truth for which locales are valid.
+    | Referenced by SetLocale middleware and LocaleController.
+    |
+    */
+    'supported_locales' => ['en', 'km'],
+
 ];

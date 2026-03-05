@@ -8,6 +8,7 @@ use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,9 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+// Locale switcher — stores choice in session, no localStorage
+Route::post('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard

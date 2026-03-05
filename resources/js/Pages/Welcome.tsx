@@ -1,9 +1,18 @@
 import { PageProps } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { APP_NAME, APP_TAGLINE } from '@/constants';
+import { Head, Link, router } from '@inertiajs/react';
+import { APP_NAME } from '@/constants';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import { useTranslation } from '@/hooks/useTranslation';
+import { supportedLocales, localeLabels, type Locale } from '@/locales/config';
 
 export default function Welcome({ auth }: PageProps) {
+    const { t, locale } = useTranslation();
+
+    const switchLocale = (next: Locale) => {
+        router.post(route('locale.switch', { locale: next }), {}, {
+            preserveScroll: true,
+        });
+    };
     return (
         <>
             <Head title="Welcome" />
@@ -24,6 +33,22 @@ export default function Welcome({ auth }: PageProps) {
                                 </span>
                             </div>
                             <div className="flex items-center space-x-4">
+                                {/* Language toggle */}
+                                <div className="flex items-center rounded-lg border border-gray-200 overflow-hidden text-sm font-medium">
+                                    {supportedLocales.map((l) => (
+                                        <button
+                                            key={l}
+                                            onClick={() => switchLocale(l)}
+                                            className={`px-3 py-1.5 transition-colors ${
+                                                locale === l
+                                                    ? 'bg-orange-600 text-white'
+                                                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            {localeLabels[l]}
+                                        </button>
+                                    ))}
+                                </div>
                                 {auth.user ? (
                                     <Link
                                         href={route('dashboard')}
@@ -72,17 +97,16 @@ export default function Welcome({ auth }: PageProps) {
                             <div>
                                 <div className="inline-flex items-center px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-sm font-medium mb-6">
                                     <span className="w-2 h-2 bg-orange-600 rounded-full mr-2 animate-pulse"></span>
-                                    Simple & Efficient Leave Management
+                                    {t('hero.badge')}
                                 </div>
                                 <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                                    Manage Leave
-                                    <span className="block bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
-                                        Effortlessly
+                                    {t('hero.h1_line1')}
+                                    <span className="text-orange-600 block">
+                                        {t('hero.h1_line2')}
                                     </span>
                                 </h1>
                                 <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                                    {APP_TAGLINE}. Track time off, approve requests, and maintain work-life balance 
-                                    with our intuitive leave management system.
+                                    {t('hero.tagline')}
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-4">
                                     {!auth.user && (
@@ -91,7 +115,7 @@ export default function Welcome({ auth }: PageProps) {
                                                 href={route('register')}
                                                 className="inline-flex items-center justify-center px-6 py-3 bg-orange-600 text-white font-semibold rounded-xl hover:bg-orange-700 transition-all hover:shadow-lg hover:shadow-orange-200"
                                             >
-                                                Register
+                                                {t('hero.cta_register')}
                                                 <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                                 </svg>
@@ -100,7 +124,7 @@ export default function Welcome({ auth }: PageProps) {
                                                 href={route('login')}
                                                 className="inline-flex items-center justify-center px-6 py-3 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
                                             >
-                                                Sign In
+                                                {t('hero.cta_signin')}
                                             </Link>
                                         </>
                                     )}

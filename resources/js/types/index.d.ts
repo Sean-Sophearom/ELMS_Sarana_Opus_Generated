@@ -1,3 +1,5 @@
+import type { Locale } from '@/locales/config';
+
 export interface User {
     id: number;
     name: string;
@@ -98,4 +100,5 @@ export type PageProps<
         success?: string;
         error?: string;
     };
+    locale: Locale;
 };
