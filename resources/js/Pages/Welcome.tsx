@@ -155,7 +155,7 @@ export default function Welcome({ auth }: PageProps) {
                                                         {item.total - item.used}
                                                     </div>
                                                     <div className="text-xs text-gray-500">
-                                                        {t('hero.used_of').replace('{used}', item.used.toString()).replace('{total}', item.total.toString())}
+                                                        {t('hero.used_of', item.used, item.total)}
                                                     </div>
                                                     <div className="mt-2 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                                                         <div 
@@ -273,7 +273,7 @@ export default function Welcome({ auth }: PageProps) {
                                 {t('cta.title')}
                             </h2>
                             <p className="text-lg text-orange-100 mb-8 max-w-2xl mx-auto">
-                                {t('cta.subtitle').replace('{app_name}', APP_NAME)}
+                                {t('cta.subtitle', APP_NAME)}
                             </p>
                             {!auth.user && (
                                 <Link

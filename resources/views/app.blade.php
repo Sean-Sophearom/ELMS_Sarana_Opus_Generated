@@ -12,7 +12,6 @@
         <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Battambang:wght@400;700&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
-        @routes
         @viteReactRefresh
         @vite(['resources/js/app.tsx', "resources/js/Pages/{$page['component']}.tsx"])
         @inertiaHead
